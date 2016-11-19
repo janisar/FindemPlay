@@ -1,27 +1,33 @@
 package dao
 
-import javax.inject.Inject
 
-import controllers.AddableObject
-import org.joda.time.DateTime
-import play.api.db.Database
+import com.redis.RedisClient
+import model.LoginUser
 import play.api.libs.json.Json
 
 /**
   * Created by saarlane on 16/11/16.
   */
-class AddableDao @Inject() (db: Database) {
+class AddableDao {
 
-  def saveAddable(addable: AddableObject): Unit = {
-    db.withConnection(connection => {
-      val statement = connection.createStatement()
-      statement.executeUpdate("INSERT INTO findem.Object (genericName, mapDrawings, description, created) VALUES (\"" +
-        addable.genericName + "\", \"" +
-        Json.toJson(addable.mapDrawings.toList).toString().replaceAll("\"", "'") + "\", \"" +
-        addable.description + "\", \"" +
-        new DateTime().toString("yyyy-MM-dd HH:mm:ss") +
-        "\")")
-      connection.close()
-    })
+  val redis = new RedisClient("127.0.0.1", 6379)
+
+  def validateLogin(loginUser: LoginUser): Boolean = {
+    val result = redis.get("user:" + loginUser.email).getOrElse("")
+
+    !result.isEmpty
+  }
+
+  def saveAddable(addable: String): Unit = {
+    redis.lpush("addable", addable)
+  }
+
+  def register(loginUser: LoginUser): Boolean = {
+    try {
+      redis.set("user:" + loginUser.email, Json.toJson(loginUser))
+      true
+    } catch {
+      case e: Exception => false
+    }
   }
 }

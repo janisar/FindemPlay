@@ -10,7 +10,9 @@ libraryDependencies ++= Seq( jdbc , cache , ws   , specs2 % Test )
 
 libraryDependencies += filters
 
-libraryDependencies += "mysql" % "mysql-connector-java" % "5.1.36"
+libraryDependencies += "org.mindrot" % "jbcrypt" % "0.3m"
+
+libraryDependencies += "net.debasishg" %% "redisclient" % "3.2"
 
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )
 
