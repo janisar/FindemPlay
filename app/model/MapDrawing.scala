@@ -36,7 +36,7 @@ object MapDrawing {
     override def reads(json: JsValue): JsResult[MapDrawing] = {
       (json \ "id").validate[Int].flatMap(id => {
         (json \ "type").validate[String].flatMap {
-          case "rect" => {
+          case "rect" =>
             (json \ "top").validate[Double].flatMap(top => {
               (json \ "right").validate[Double].flatMap(right => {
                 (json \ "left").validate[Double].flatMap(left => {
@@ -46,14 +46,12 @@ object MapDrawing {
                 })
               })
             })
-          }
-          case "circle" => {
+          case "circle" =>
             (json \ "radius").validate[Double].flatMap(radius => {
               (json \ "center").validate[Point].map(center => {
                 Circle(id, radius, center)
               })
             })
-          }
         }
       })
     }

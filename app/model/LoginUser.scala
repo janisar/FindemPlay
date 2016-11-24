@@ -1,11 +1,16 @@
 package model
 
+import org.mindrot.jbcrypt.BCrypt
 import play.api.libs.json._
 
 /**
   * Created by saarlane on 19/11/16.
   */
-case class LoginUser(userName: String, password: String, email: String)
+case class LoginUser(
+                     userName: String,
+                     password: String,
+                     email: String,
+                     salt: String)
 
 object LoginUser {
   implicit object LoginUserFormat extends Format[LoginUser] {
@@ -13,7 +18,8 @@ object LoginUser {
       (json \ "userName").validate[String].flatMap(userName => {
         (json \ "email").validate[String].flatMap(email => {
           (json \ "password").validate[String].map(password => {
-            LoginUser(userName, password, email)
+
+            saveUser(userName, email, password)
           })
         })
       })
@@ -23,8 +29,14 @@ object LoginUser {
       Seq(
         "email" -> JsString(o.email),
         "userName" -> JsString(o.userName),
-        "password" -> JsString(o.password)
+        "password" -> JsString(o.password),
+        "salt" -> JsString(o.salt)
       )
     )
+  }
+
+  def saveUser(userName: String, email: String, password: String): LoginUser = {
+    val salt = BCrypt.gensalt(10)
+    LoginUser(userName, password, email, salt)
   }
 }
