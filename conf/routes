@@ -5,8 +5,8 @@
 # Home page
 GET     /                           controllers.Application.index
 
-POST    /saveObject                 controllers.Application.saveObject
-GET     /getFindemObjects           controllers.Application.getObjects
+POST    /saveObject                 controllers.FindemController.saveObject
+GET     /getFindemObjects           controllers.FindemController.getObjects
 POST    /login                      controllers.LoginController.login
 POST    /register                   controllers.LoginController.register
 POST    /saveFile/:id               controllers.FileController.saveFile(id: Long)
