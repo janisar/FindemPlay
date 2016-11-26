@@ -3,6 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import dao.MissingObjectDao
+import model.FindemObject
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Results}
 
@@ -12,8 +13,8 @@ import play.api.mvc.{Action, Results}
 class FindemController @Inject() (missingObjectDao: MissingObjectDao) {
 
   def saveObject = Action { request =>
-    val json = request.body.asJson.get
-    val id = missingObjectDao.saveAddable(json.toString())
+    val findemObject = request.body.asJson.get.as[FindemObject]
+    val id = missingObjectDao.saveAddable(Json.toJson(findemObject).toString())
 
     Results.Ok(id.toString)
   }

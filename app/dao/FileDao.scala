@@ -24,7 +24,16 @@ class FileDao @Inject()(configuration: Configuration, missingObjectDao: MissingO
     val missingObject = missingObjectDao.getById(objectId)
 
     val filePaths = missingObject.filePaths ::: List("assets/" + fileName)
-    val findemObject = FindemObject(missingObject.genericName, missingObject.mapDrawings, missingObject.description, filePaths)
+
+    val findemObject = FindemObject(
+      missingObject.objectType,
+      missingObject.genericName,
+      missingObject.firstName,
+      missingObject.lastName,
+      missingObject.mapDrawings,
+      missingObject.description,
+      missingObject.created,
+      filePaths)
 
     missingObjectDao.updateFindemObject(findemObject, objectId.toInt)
   }
