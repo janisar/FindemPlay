@@ -5,6 +5,7 @@ import javax.inject.Inject
 
 import com.redis.RedisClient
 import model.{FindemObject, LoginUser}
+import org.joda.time.DateTime
 import org.mindrot.jbcrypt.BCrypt
 import play.api.Configuration
 import play.api.libs.json.Json
@@ -39,7 +40,8 @@ class MissingObjectDao @Inject()(configuration: Configuration) {
     result
   }
 
-  def saveAddable(missingObject: String): Long = {
-    redis.rpush(MISSING_OBJECT_INDEX, missingObject).getOrElse(0)
+  def saveAddable(o: FindemObject): Long = {
+    val savingObject = FindemObject(o.objectType, o.genericName, o.firstName, o.lastName, o.mapDrawings, o.description, new DateTime().toString, o.filePaths)
+    redis.rpush(MISSING_OBJECT_INDEX, Json.stringify(Json.toJson(savingObject))).getOrElse(0)
   }
 }

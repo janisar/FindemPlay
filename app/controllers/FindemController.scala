@@ -14,7 +14,7 @@ class FindemController @Inject() (missingObjectDao: MissingObjectDao) {
 
   def saveObject = Action { request =>
     val findemObject = request.body.asJson.get.as[FindemObject]
-    val id = missingObjectDao.saveAddable(Json.toJson(findemObject).toString())
+    val id = missingObjectDao.saveAddable(findemObject)
 
     Results.Ok(id.toString)
   }

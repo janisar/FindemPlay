@@ -28,9 +28,7 @@ object LoginUser {
     override def writes(o: LoginUser): JsValue = JsObject(
       Seq(
         "email" -> JsString(o.email),
-        "userName" -> JsString(o.userName),
-        "password" -> JsString(o.password),
-        "salt" -> JsString(o.salt)
+        "userName" -> JsString(o.userName)
       )
     )
   }

@@ -1,6 +1,5 @@
 package model
 
-import org.joda.time.DateTime
 import play.api.libs.json._
 
 case class FindemObject(objectType: Int,
@@ -9,7 +8,7 @@ case class FindemObject(objectType: Int,
                         lastName: String,
                         mapDrawings: Array[MapDrawing],
                         description: String,
-                        created: DateTime,
+                        created: String,
                         filePaths: List[String])
 
 object FindemObject {
@@ -35,27 +34,29 @@ object FindemObject {
     }
 
     override def reads(json: JsValue): JsResult[FindemObject] = {
-      def createForObject(objectType: Int, genericName: String, mapDrawings: Array[MapDrawing], filePaths: List[String]): JsResult[FindemObject] = {
+      def createForObject(objectType: Int, genericName: String, mapDrawings: Array[MapDrawing],
+                          created: String, filePaths: List[String]): JsResult[FindemObject] = {
         (json \ "description").validateOpt[String].map {
           case Some(desc) => FindemObject(objectType, genericName, "", "",
             mapDrawings, desc,
-            new DateTime, filePaths)
+            created, filePaths)
 
           case None => FindemObject(objectType, genericName, "", "",
             mapDrawings, "",
-            new DateTime, filePaths)
+            created, filePaths)
         }
       }
 
-      def createForPerson(objectType: Int, firstName: String, lastName: String, mapDrawings: Array[MapDrawing], filePaths: List[String]): JsResult[FindemObject] = {
+      def createForPerson(objectType: Int, firstName: String, lastName: String, mapDrawings: Array[MapDrawing],
+                          created: String, filePaths: List[String]): JsResult[FindemObject] = {
         (json \ "description").validateOpt[String].map {
           case Some(desc) => FindemObject(objectType, "", firstName, lastName,
             mapDrawings, desc,
-            new DateTime, filePaths)
+            created, filePaths)
 
           case None => FindemObject(objectType, "", firstName, lastName,
             mapDrawings, "",
-            new DateTime, filePaths)
+            created, filePaths)
         }
       }
 
@@ -63,12 +64,15 @@ object FindemObject {
         case 0 => {
           (json \ "genericName").validate[String].flatMap(genericName => {
             (json \ "mapDrawings").validate[Array[MapDrawing]].flatMap(mapDrawings => {
-              (json \ "filePaths").validateOpt[List[String]].flatMap {
-                case Some(filePaths) =>
-                  createForObject(0, genericName, mapDrawings, filePaths)
-                case None =>
-                  createForObject(0, genericName, mapDrawings, List())
-              }
+              (json \ "created").validateOpt[String].flatMap(created => {
+                val createdDate = created.getOrElse("")
+                (json \ "filePaths").validateOpt[List[String]].flatMap {
+                  case Some(filePaths) =>
+                    createForObject(0, genericName, mapDrawings, createdDate, filePaths)
+                  case None =>
+                    createForObject(0, genericName, mapDrawings, createdDate, List())
+                }
+              })
             })
           })
         }
@@ -76,12 +80,15 @@ object FindemObject {
           (json \ "firstName").validate[String].flatMap(firstName => {
             (json \ "lastName").validate[String].flatMap(lastName => {
               (json \ "mapDrawings").validate[Array[MapDrawing]].flatMap(mapDrawings => {
-                (json \ "filePaths").validateOpt[List[String]].flatMap {
-                  case Some(filePaths) =>
-                    createForPerson(1, firstName, lastName, mapDrawings, filePaths)
-                  case None =>
-                    createForPerson(1, firstName, lastName, mapDrawings, List())
-                }
+                (json \ "created").validateOpt[String].flatMap(created => {
+                  val createdDate = created.getOrElse("")
+                  (json \ "filePaths").validateOpt[List[String]].flatMap {
+                    case Some(filePaths) =>
+                      createForPerson(1, firstName, lastName, mapDrawings, createdDate, filePaths)
+                    case None =>
+                      createForPerson(1, firstName, lastName, mapDrawings, createdDate, List())
+                  }
+                })
               })
             })
           })
